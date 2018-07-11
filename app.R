@@ -193,15 +193,10 @@ server <- function(input, output) {
         })
     
     output$dashboardPlot<-renderPlotly({
-      #ggplot(dat(),aes(x=date,y=num))+geom_point(colour='red')},height = 400,width = 600)
+      #Outputs the date plot found in productionRequestDataParse.R
       ggplotly(d)
     })
 }
-#hchart(mpgman2, "column", hcaes(x = class, y = n, group = year))
-#output$ay_plot <- renderHighchart({
-#    dat <- ay_plot_prep()$dat
-#    titles <- ay_plot_prep()$titles
-    
-#    highchart() %>%
+
 
 shinyApp(ui, server)
