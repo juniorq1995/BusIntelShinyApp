@@ -4,6 +4,15 @@ library(shinydashboard)
 #devtools::install_github("dreamRs/shinyWidgets")
 library(shinyWidgets)
 #source('testScript.R') #move to a global.R file where all files can access the objects created by source call
+#install.packages("highcharter")
+library(highcharter)
+#install.packages("devtools")
+library(devtools)
+#install.packages('DT')
+library(DT)
+#install.packages("plotly")
+library(plotly)
+#source("productionRequestDataParsePlot.R")
 
 ui <- dashboardPage(
     dashboardHeader(title = "Dynamic sidebar"),
@@ -31,7 +40,7 @@ ui <- dashboardPage(
                                 width = 12,
                                 #Example from insurance app
                                 #highchartOutput("ay_plot")
-                                plotOutput("dashboardPlot")
+                                plotlyOutput("dashboardPlot")
                             )
                         )
                     ),
@@ -42,14 +51,11 @@ ui <- dashboardPage(
                             width=12,
                             radioButtons("dataType",label=NULL,choices=c("Dates","Requests"),inline=TRUE),
                             "Choose the years to display",
-                            pickerInput("Years", choices = c("All Years","2013","2014","2015","2016","2017","2018"),selected = "All Years",multiple=TRUE)
-                        
+                            pickerInput("Years", choices = c("2013","2014","2015","2016","2017","2018"),options = list('actions-box' = TRUE),selected = c("2013","2014","2015","2016","2017","2018"),multiple=TRUE)
                     )
                     
                     )
                 )
-                
-                
             ),
             tabItem(
                 tabName = "dataTable",
@@ -77,7 +83,7 @@ server <- function(input, output) {
     
     output$noRequests <- renderValueBox({
         valueBox(
-            paste0(NULL,"13,000,000"), "Number of Requests", icon = icon("arrow-right"),
+            paste0(NULL,length(typesRequests)), "Number of Requests", icon = icon("arrow-right"),
             width = 2,
             color = "blue"
         )
@@ -185,7 +191,17 @@ server <- function(input, output) {
                 )
             )
         })
+    
+    output$dashboardPlot<-renderPlotly({
+      #ggplot(dat(),aes(x=date,y=num))+geom_point(colour='red')},height = 400,width = 600)
+      ggplotly(d)
+    })
 }
-
+#hchart(mpgman2, "column", hcaes(x = class, y = n, group = year))
+#output$ay_plot <- renderHighchart({
+#    dat <- ay_plot_prep()$dat
+#    titles <- ay_plot_prep()$titles
+    
+#    highchart() %>%
 
 shinyApp(ui, server)
