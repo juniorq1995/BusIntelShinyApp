@@ -36,11 +36,17 @@ ui <- dashboardPage(
                             valueBoxOutput("popularRequestType")
                         ),
                         fluidRow(
-                            box(
-                                width = 12,
+                            tabBox( id="tabChart",width=12,
+                              tabPanel(
+                                "Years",
                                 #Example from insurance app
                                 #highchartOutput("ay_plot")
-                                plotlyOutput("dashboardPlot")
+                                plotlyOutput("dashboardPlotYears")
+                              ),
+                              tabPanel(
+                                "Request Types",
+                                plotlyOutput("dashboardPlotRequests")
+                              )
                             )
                         )
                     ),
@@ -49,11 +55,10 @@ ui <- dashboardPage(
                         box(
                             title="Data Filters",
                             width=12,
-                            radioButtons("dataType",label=NULL,choices=c("Dates","Requests"),inline=TRUE),
+                            #radioButtons("dataType",label=NULL,choices=c("Dates","Requests"),inline=TRUE),
                             "Choose the years to display",
                             pickerInput("Years", choices = c("2013","2014","2015","2016","2017","2018"),options = list('actions-box' = TRUE),selected = c("2013","2014","2015","2016","2017","2018"),multiple=TRUE)
                     )
-                    
                     )
                 )
             ),
@@ -64,7 +69,6 @@ ui <- dashboardPage(
                     box(width = 12, DT::dataTableOutput('tbl_b'))
                 )
             )
-            
         )
     )     
 )
@@ -77,13 +81,9 @@ server <- function(input, output) {
         )
     })
     
-    output$dashboardPlot <- renderPlot({
-        
-    })
-    
     output$noRequests <- renderValueBox({
         valueBox(
-            paste0(NULL,length(typesRequests)), "Number of Requests", icon = icon("arrow-right"),
+            toString(format(length(typesRequests),big.mark=",",scientific=FALSE)), "Number of Requests", icon = icon("arrow-right"),
             width = 2,
             color = "blue"
         )
@@ -91,7 +91,7 @@ server <- function(input, output) {
     
     output$avgRequests <- renderValueBox({
         valueBox(
-            "400,000/month", "Avg. Requests/Month", icon = icon("calendar"),
+          toString(format(avgRequestsPerMonth,big.mark=",",scientific=FALSE)), "Avg. Requests/Month", icon = icon("calendar"),
             width = 2,
             color = "green"
         )
@@ -157,7 +157,7 @@ server <- function(input, output) {
         dataset <- sqlFetch(conn,"flex22213",colnames = FALSE,rownames = FALSE)
         
         #exists(deparse(substitute(dataset)))    
-        if (!is.null(dataset) && is.data.frame(dataset)) {
+        if (!is.null(dataset) && is.data.frame(dataset)){
             vals$data <- dataset
             
             removeModal()
@@ -192,11 +192,14 @@ server <- function(input, output) {
             )
         })
     
-    output$dashboardPlot<-renderPlotly({
+    output$dashboardPlotYears<-renderPlotly({
       #Outputs the date plot found in productionRequestDataParse.R
       ggplotly(d)
     })
+    output$dashboardPlotRequests<-renderPlotly({
+      #Outputs the date plot found in productionRequestDataParse.R
+      ggplotly(dt2)
+    })
 }
-
 
 shinyApp(ui, server)

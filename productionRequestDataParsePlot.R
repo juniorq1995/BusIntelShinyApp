@@ -55,6 +55,7 @@ while(length(months17) != length(months18))
 library(reshape)
 library(ggplot2)
 df1 <- data.frame(months17,months18,months)
+avgRequestsPerMonth = (sum(df1$months17,na.rm=TRUE) + sum(df1$months18,na.rm=TRUE)) / 24
 df2 <- melt(df1, id.vars='months')
 
 #head(df2)
