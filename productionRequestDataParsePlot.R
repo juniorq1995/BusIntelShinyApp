@@ -1,4 +1,4 @@
-requestDataRaw <- read.csv("FlexRFR2017_53118")
+#requestDataRaw <- dataset
 #demo() runs opens demo file
 typesRequests <- requestDataRaw[,3]
 
@@ -27,7 +27,6 @@ year2018Freq <- c()
 for(i in months){
   year2017Freq <- append(year2017Freq, freqMonthlyDate2017[toString(i)])
   year2018Freq <- append(year2018Freq, freqMonthlyDate2018[toString(i)])
-  
 }
 
 #set months equal to a vector of months from the longest set
@@ -57,8 +56,6 @@ library(ggplot2)
 df1 <- data.frame(months17,months18,months)
 avgRequestsPerMonth = (sum(df1$months17,na.rm=TRUE) + sum(df1$months18,na.rm=TRUE)) / 24
 df2 <- melt(df1, id.vars='months')
-
-#head(df2)
 
 d <- ggplot(df2, aes(x=months, y=value, fill=variable)) + geom_bar(stat='identity', position='dodge')
 
@@ -98,6 +95,10 @@ if(length(dfTypes2018$Var1) < length(dfTypes2017$Var1)){
 
 dfTypesBothYears <- data.frame(dfTypes2017[,2],dfTypes2018[,2],dfTypes2017[,1])
 df4 <- melt(dfTypesBothYears,id.vars='dfTypes2017...1.')
+
+summaryRequests <- data.frame(table(typesRequests))
+listOfTypes <- lapply(data.frame(table(as.character(typesRequests)))[,1],as.character)
+
 #Difference in number of request per year
 dt <- ggplot(df4, aes(x="", y=value, fill=variable)) + geom_bar(stat='identity', position='dodge')
 #Compares each request type for the years 2017 and 2018

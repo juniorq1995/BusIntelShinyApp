@@ -56,6 +56,8 @@ ui <- dashboardPage(
                             title="Data Filters",
                             width=12,
                             #radioButtons("dataType",label=NULL,choices=c("Dates","Requests"),inline=TRUE),
+                            "Choose the types of requests to display",
+                            pickerInput("Requests", choices = listOfTypes,options = list('actions-box' = TRUE),selected = listOfTypes,multiple=TRUE),
                             "Choose the years to display",
                             pickerInput("Years", choices = c("2013","2014","2015","2016","2017","2018"),options = list('actions-box' = TRUE),selected = c("2013","2014","2015","2016","2017","2018"),multiple=TRUE)
                     )
@@ -99,7 +101,7 @@ server <- function(input, output) {
     
     output$popularRequestType <- renderValueBox({
         valueBox(
-            "TASC:Card", "Most popular method of Request", icon = icon("sunglasses", lib = "glyphicon"),
+          toString(data.frame(table(typesRequests))$typesRequests[which(summaryRequests$Freq == max(summaryRequests$Freq))]), "Most popular method of Request", icon = icon("sunglasses", lib = "glyphicon"),
             width = 2,
             color = "orange"
         )
@@ -124,6 +126,9 @@ server <- function(input, output) {
             ),
             textInput("database", "Choose database",
                       placeholder = 'Try "mtcars" or "abc"'
+            ),
+            textInput("table", "Choose a table",
+                        placeholder = 'Try "flex22213"'
             ),
             textInput("UID", "Enter User ID",
                       placeholder = 'Try "mtcars" or "abc"'
@@ -154,8 +159,8 @@ server <- function(input, output) {
         credentials <- paste('driver={',input$driver,'};server=',input$server,';database=',input$database,';uid=',input$UID,';pwd=',input$password,sep = "")
         library(odbc)
         conn <- odbcDriverConnect(credentials)
-        dataset <- sqlFetch(conn,"flex22213",colnames = FALSE,rownames = FALSE)
-        
+        dataset <- sqlFetch(conn,input$table,colnames = FALSE,rownames = FALSE)
+        source("productionRequestDataParsePlot.R")
         #exists(deparse(substitute(dataset)))    
         if (!is.null(dataset) && is.data.frame(dataset)){
             vals$data <- dataset
